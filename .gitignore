@@ -1,0 +1,24 @@
+# Credenciales del laboratorio PostgreSQL (clase02). Nunca versionar.
+clase02/student_credentials.csv
+clase02/.secrets/
+clase02/.venv/
+clase02/**/*.pem
+clase02/**/*.key
+clase02/**/admin.env
+clase02/**/userlist.txt
+
+# Clase 03. Secretos, logs y entregas de estudiantes. Nunca versionar.
+clase03/.secrets/
+clase03/**/secrets.env
+clase03/**/.env
+clase03/airflow/logs/
+clase03/airflow/reportes/
+clase03/airflow/specs/
+clase03/airflow/config/simple_auth_manager_passwords.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
