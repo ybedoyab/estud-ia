@@ -1,0 +1,10 @@
+[Unit]
+Description=Pausa los DAG de estudiantes a las 21:00 hora de Bogota
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 UTC
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

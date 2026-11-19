@@ -1,0 +1,7 @@
+[Unit]
+Description=Pausa los DAG de estudiantes de la clase 03
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/estudia-clase03
+ExecStart=/opt/estudia-clase03/infra/pause_student_dags.sh

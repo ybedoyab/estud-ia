@@ -1,0 +1,151 @@
+x-airflow-common: &airflow-common
+  build: .
+  env_file: .env
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.api_fastapi.auth.managers.simple.simple_auth_manager.SimpleAuthManager
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: docente:admin
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg://airflow:${METADATA_PASSWORD}@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    AIRFLOW__CORE__PARALLELISM: "8"
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: "2"
+    AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: "1"
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: America/Bogota
+    AIRFLOW__API_AUTH__JWT_SECRET: ${JWT_SECRET}
+    AIRFLOW__API_AUTH__JWT_ISSUER: estudia
+    AIRFLOW__API__BASE_URL: ${PUBLIC_AIRFLOW_URL}
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "false"
+    AIRFLOW__DAG_PROCESSOR__REFRESH_INTERVAL: "10"
+    PYTHONPATH: /opt/airflow/plugins
+    ESTUDIA_PGHOST: ${ESTUDIA_PGHOST}
+    ESTUDIA_PGPORT: ${ESTUDIA_PGPORT}
+    ESTUDIA_PGDATABASE: ${ESTUDIA_PGDATABASE}
+    ESTUDIA_PGUSER: ${ESTUDIA_PGUSER}
+    ESTUDIA_PGPASSWORD: ${ESTUDIA_PGPASSWORD}
+    ESTUDIA_SPECS: /opt/airflow/specs
+    ESTUDIA_REPORTES: /opt/airflow/reportes
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./specs:/opt/airflow/specs
+    - ./reportes:/opt/airflow/reportes
+    - ./config/simple_auth_manager_passwords.json:/opt/airflow/simple_auth_manager_passwords.json
+  user: "50000:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${METADATA_PASSWORD}
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    restart: always
+
+  airflow-apiserver:
+    <<: *airflow-common
+    command: api-server --proxy-headers
+    expose: ["8080"]
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    user: "0:0"
+    command:
+      - -c
+      - |
+        mkdir -p /opt/airflow/{logs,dags,plugins,specs,reportes,config}
+        chown -R 50000:0 /opt/airflow/{logs,dags,plugins,specs,reportes,config}
+        /entrypoint airflow db migrate
+        /entrypoint airflow pools set clase03 6 "limite de concurrencia de la clase 03"
+    environment:
+      <<: *airflow-env
+      _AIRFLOW_DB_MIGRATE: "true"
+    restart: "no"
+
+  fastapi:
+    build: ../api
+    env_file: .env
+    environment:
+      ESTUDIA_DAGS: /data/dags
+      ESTUDIA_SPECS: /data/specs
+      ESTUDIA_REPORTES: /data/reportes
+      AIRFLOW_API_URL: http://airflow-apiserver:8080
+    volumes:
+      - ./dags:/data/dags
+      - ./specs:/data/specs
+      - ./reportes:/data/reportes
+    user: "50000:0"
+    depends_on:
+      airflow-apiserver:
+        condition: service_healthy
+    restart: always
+
+  caddy:
+    image: caddy:2.10
+    environment:
+      API_HOST: ${API_HOST}
+      AIRFLOW_HOST: ${AIRFLOW_HOST}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - fastapi
+      - airflow-apiserver
+    restart: always
+
+volumes:
+  postgres-db:
+  caddy-data:
+  caddy-config:

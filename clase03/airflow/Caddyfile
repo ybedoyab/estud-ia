@@ -1,0 +1,13 @@
+{
+	email fastex.999@gmail.com
+}
+
+{$API_HOST} {
+	encode gzip
+	reverse_proxy fastapi:8000
+}
+
+{$AIRFLOW_HOST} {
+	encode gzip
+	reverse_proxy airflow-apiserver:8080
+}
