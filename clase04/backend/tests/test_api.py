@@ -36,6 +36,17 @@ def _entrar(cliente, usuario="estudiante01"):
     return cuerpo["access_token"]
 
 
+def test_openapi_muestra_bearer_sin_cambiar_el_login(cliente):
+    esquema = cliente.get("/api/v4/openapi.json").json()
+    bearer = esquema["components"]["securitySchemes"]["HTTPBearer"]
+    assert bearer["scheme"] == "bearer"
+    assert "security" not in esquema["paths"]["/api/v4/auth/login"]["post"]
+    assert "security" not in esquema["paths"]["/api/v4/health"]["get"]
+    assert esquema["paths"]["/api/v4/productos"]["get"]["security"] == [{"HTTPBearer": []}]
+    login = esquema["components"]["schemas"]["LoginBody"]
+    assert login["required"] == ["username", "password"]
+
+
 def test_health(cliente):
     respuesta = cliente.get("/api/v4/health")
     assert respuesta.status_code == 200

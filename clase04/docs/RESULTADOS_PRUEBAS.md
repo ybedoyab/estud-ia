@@ -4,7 +4,7 @@ Fecha de la comprobación: 24 de noviembre de 2026.
 
 ## Unitarias
 
-12 pruebas de pytest, en local, sin base de datos. Cubren login, dos sesiones del usuario compartido, rechazo de un JWT ajeno, token vencido, 400, 401, 403, 404, 405, 422, 429, 500, 503 y el aislamiento del sandbox. Resultado: 12 passed.
+13 pruebas de pytest, en local, sin base de datos, el 24 de noviembre de 2026 por la noche. Cubren login, dos sesiones del usuario compartido, rechazo de un JWT ajeno, token vencido, 400, 401, 403, 404, 405, 422, 429, 500, 503, el aislamiento del sandbox y el esquema Bearer de OpenAPI. Resultado: 13 passed. Health y login quedan fuera de `security`. `GET /api/v4/productos` lo exige. `LoginBody` sigue pidiendo `username` y `password`.
 
 ## Humo contra la URL pública
 
@@ -43,7 +43,17 @@ Filtro `' OR 1=1 --` → 200 y 0 filas.
 
 ## Notebook
 
-`nbclient` ejecutó las 30 celdas del notebook contra la API, con la cuenta `estudiante46`, dentro de un contenedor en la VM. No se abrió Google Colab en el navegador.
+La versión anterior, de 30 celdas, se ejecutó con `nbclient` y la cuenta `estudiante46` dentro de un contenedor en la VM.
+
+La versión de 48 celdas se ejecutó el 24 de noviembre de 2026 por la noche, con `nbclient` y el intérprete local, contra la API pública y el usuario compartido `estudiante`. Terminaron las 48 celdas. Identidad `compartida`, sesiones distintas, códigos 200, 201, 204, 400, 401, 403, 404, 405, 422, 429, 500 y 503, y el resumen final en OK. Las salidas y los archivos no contenían token ni contraseña.
+
+Una copia del mismo cuaderno, fuera del repositorio, se ejecutó en modo respaldo. Terminó, etiquetó los resultados como `RESPALDO` y dejó el resumen en NO. No se mezcló con la corrida en vivo.
+
+No se abrió Google Colab en el navegador. No se usó Postman gráfico. Newman no está instalado y no se ejecutó. No se repitió la prueba de 45 usuarios: el único cambio de la API fue el esquema de seguridad en el documento OpenAPI.
+
+## OpenAPI público
+
+`GET /api/v4/openapi.json` respondió 200. El esquema `HTTPBearer` está declarado. No aparece en health ni en el login. Sí aparece en productos. `GET /api/v4/health` y `GET /health` siguieron en 200 después de recrear el contenedor, sin regenerar secretos.
 
 ## Carga
 

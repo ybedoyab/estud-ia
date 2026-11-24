@@ -48,6 +48,40 @@ app.include_router(datos.router)
 app.include_router(sandbox.router)
 app.include_router(ejemplos.router)
 
+RUTAS_SIN_TOKEN = {"/api/v4/health", "/api/v4/auth/login"}
+
+
+def esquema_openapi():
+    """Documenta el Bearer en Swagger. No cambia quién puede llamar la API."""
+    if app.openapi_schema:
+        return app.openapi_schema
+    from fastapi.openapi.utils import get_openapi
+
+    esquema = get_openapi(
+        title=app.title,
+        version=app.version,
+        summary=app.summary,
+        routes=app.routes,
+    )
+    esquemas = esquema.setdefault("components", {}).setdefault("securitySchemes", {})
+    esquemas["HTTPBearer"] = {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Pega el access_token de POST /api/v4/auth/login. No lo compartas.",
+    }
+    for ruta, operaciones in esquema.get("paths", {}).items():
+        if ruta in RUTAS_SIN_TOKEN:
+            continue
+        for metodo, operacion in operaciones.items():
+            if metodo in {"get", "post", "put", "patch", "delete"}:
+                operacion["security"] = [{"HTTPBearer": []}]
+    app.openapi_schema = esquema
+    return esquema
+
+
+app.openapi = esquema_openapi
+
 
 @app.middleware("http")
 async def solicitud(request: Request, call_next):
