@@ -4,7 +4,12 @@
 
 {$API_HOST} {
 	encode gzip
-	reverse_proxy fastapi:8000
+	handle /api/v4* {
+		reverse_proxy clase04:8000
+	}
+	handle {
+		reverse_proxy fastapi:8000
+	}
 }
 
 {$AIRFLOW_HOST} {

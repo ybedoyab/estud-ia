@@ -1,0 +1,782 @@
+{
+  "info": {
+    "name": "EstudIA Clase 04",
+    "description": "API educativa de solo lectura. El login guarda el token en la variable access_token y no lo imprime.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://34.95.210.33.sslip.io"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "id_producto",
+      "value": "1"
+    },
+    {
+      "key": "id_tarea",
+      "value": ""
+    },
+    {
+      "key": "page",
+      "value": "1"
+    },
+    {
+      "key": "page_size",
+      "value": "20"
+    }
+  ],
+  "item": [
+    {
+      "name": "00. Health Check",
+      "item": [
+        {
+          "name": "Salud clase 04",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/health",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Salud clase 03 sigue viva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/health",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"clase 03\", () => pm.expect(pm.response.json().servicio).to.eql(\"estudia-clase03\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01. Autenticacion",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v4/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"login 200\", function () { pm.response.to.have.status(200); });",
+                  "const cuerpo = pm.response.json();",
+                  "pm.test(\"trae token y alcance\", function () {",
+                  "    pm.expect(cuerpo).to.have.property(\"token_type\", \"bearer\");",
+                  "    pm.expect(cuerpo).to.have.property(\"scope\", \"retail:read\");",
+                  "    pm.expect(cuerpo.expires_in).to.eql(14400);",
+                  "});",
+                  "pm.environment.set(\"access_token\", cuerpo.access_token);",
+                  "pm.collectionVariables.set(\"access_token\", cuerpo.access_token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quien soy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/auth/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"identidad\", () => pm.expect(pm.response.json()).to.have.property(\"sesion\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/productos",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02. Primer GET",
+      "item": [
+        {
+          "name": "Listar productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/productos?page={{page}}&page_size={{page_size}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 y paginacion\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const pagina = pm.response.json().pagination;",
+                  "    pm.expect(pagina).to.include.all.keys(\"page\", \"page_size\", \"total_records\", \"total_pages\", \"has_next\");",
+                  "});",
+                  "if (pm.response.json().data && pm.response.json().data.length) {",
+                  "    pm.environment.set(\"id_producto\", String(pm.response.json().data[0].id_producto || pm.environment.get(\"id_producto\")));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/categorias"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03. Path parameters",
+      "item": [
+        {
+          "name": "Producto por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/productos/{{id_producto}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transaccion anidada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas/1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"anidada\", () => { const c = pm.response.json(); pm.expect(c.producto).to.be.an(\"object\"); pm.expect(c.tienda).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Producto inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/productos/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04. Query parameters y filtros",
+      "item": [
+        {
+          "name": "Ventas de Electronica en Andalucia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas?region=Andalucía&categoria=Electrónica&page=1&page_size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 y paginacion\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const pagina = pm.response.json().pagination;",
+                  "    pm.expect(pagina).to.include.all.keys(\"page\", \"page_size\", \"total_records\", \"total_pages\", \"has_next\");",
+                  "});",
+                  "if (pm.response.json().data && pm.response.json().data.length) {",
+                  "    pm.environment.set(\"id_producto\", String(pm.response.json().data[0].id_producto || pm.environment.get(\"id_producto\")));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05. Paginacion",
+      "item": [
+        {
+          "name": "Pagina 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas?page=1&page_size=20&orden=id_transaccion"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 y paginacion\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const pagina = pm.response.json().pagination;",
+                  "    pm.expect(pagina).to.include.all.keys(\"page\", \"page_size\", \"total_records\", \"total_pages\", \"has_next\");",
+                  "});",
+                  "if (pm.response.json().data && pm.response.json().data.length) {",
+                  "    pm.environment.set(\"id_producto\", String(pm.response.json().data[0].id_producto || pm.environment.get(\"id_producto\")));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pagina 2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas?page=2&page_size=20&orden=id_transaccion"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 y paginacion\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const pagina = pm.response.json().pagination;",
+                  "    pm.expect(pagina).to.include.all.keys(\"page\", \"page_size\", \"total_records\", \"total_pages\", \"has_next\");",
+                  "});",
+                  "if (pm.response.json().data && pm.response.json().data.length) {",
+                  "    pm.environment.set(\"id_producto\", String(pm.response.json().data[0].id_producto || pm.environment.get(\"id_producto\")));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "page_size invalido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas?page_size=0"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06. JSON anidado",
+      "item": [
+        {
+          "name": "Muestra de 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas/muestra?limite=200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07. Indicadores",
+      "item": [
+        {
+          "name": "Resumen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/indicadores/resumen"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Por categoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/indicadores/ventas-por-categoria"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Por region",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/indicadores/ventas-por-region"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Por periodo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/indicadores/ventas-por-periodo?granularidad=mes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08. Sandbox CRUD",
+      "item": [
+        {
+          "name": "Listar tareas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/sandbox/tareas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"respuesta JSON\", function () {",
+                  "    pm.response.to.be.success;",
+                  "    pm.response.to.have.jsonBody();",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear tarea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v4/sandbox/tareas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Practicar POST\",\n  \"detalle\": \"Tarea ficticia de la sesion\",\n  \"estado\": \"pendiente\",\n  \"prioridad\": 2\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201)); pm.environment.set(\"id_tarea\", pm.response.json().id_tarea);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reemplazar tarea",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v4/sandbox/tareas/{{id_tarea}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Practicar PUT\",\n  \"detalle\": \"Reemplazo completo\",\n  \"estado\": \"en_progreso\",\n  \"prioridad\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar estado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v4/sandbox/tareas/{{id_tarea}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"hecha\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar tarea",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/v4/sandbox/tareas/{{id_tarea}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09. Manejo de errores",
+      "item": [
+        {
+          "name": "Fechas cruzadas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ventas?fecha_desde=2024-12-01&fecha_hasta=2024-01-01"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prohibido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ejemplos/prohibido"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Demasiado rapido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ejemplos/demasiado-rapido"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"429\", () => { pm.response.to.have.status(429); pm.expect(pm.response.headers.get(\"Retry-After\")).to.eql(\"2\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Error interno de ejemplo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ejemplos/error-interno"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"500\", () => pm.response.to.have.status(500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No disponible de ejemplo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v4/ejemplos/no-disponible"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"503\", () => pm.response.to.have.status(503));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Escritura sobre ventas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v4/ventas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"importe_neto\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

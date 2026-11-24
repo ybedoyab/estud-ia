@@ -16,6 +16,11 @@ clase03/airflow/reportes/
 clase03/airflow/specs/
 clase03/airflow/config/simple_auth_manager_passwords.json
 
+# Clase 04. Secretos locales. Nunca versionar.
+clase04/.secrets/
+clase04/**/.env
+clase04/**/secrets.env
+
 # Python
 __pycache__/
 *.py[cod]
