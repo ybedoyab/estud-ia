@@ -10,6 +10,6 @@ Las contraseñas de PostgreSQL no se guardan en la API ni se escriben en el cuad
 
 Los secretos de servicio están en `/root/estudia-clase03/secrets.env`, modo 600. No están en git. El cuaderno solo tiene el host, el puerto, el nombre de la base y la URL pública.
 
-La interfaz completa de Airflow queda para el docente, con usuario `docente`. Los estudiantes miran su estado por la API. El simple auth manager de Airflow no alcanza para dar a 45 personas una cuenta limitada y segura dentro de la interfaz; por eso no se crearon usuarios de Airflow para ellos.
+En la interfaz de Airflow el docente entra con el usuario `docente` y ve todo. Un estudiante entra con su usuario `estudianteNN` y la misma contraseña de PostgreSQL. Esa contraseña no se copia en Airflow: el inicio de sesión la comprueba contra PostgreSQL. Dentro de la interfaz solo ve el DAG `estudia_estudianteNN_pipeline`. El usuario compartido `estudiante` no entra.
 
 La metadata de Airflow es un Postgres distinto, dentro de la VM de Airflow. No está en `retail_dwh`.

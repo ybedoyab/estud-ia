@@ -1,6 +1,8 @@
 # Cómo dar la clase 03
 
-Tres horas. El cuaderno es `clase03/notebooks/EstudIA_Clase03_SQL_Pandas_Airflow.ipynb`. Súbelo a Colab o ábrelo si ya está en Drive, y pide a cada estudiante: **Archivo → Guardar una copia en Drive**.
+Tres horas. El cuaderno que ven los estudiantes es `clase03/notebooks/EstudIA_Clase03_SQL_Pandas_Airflow.ipynb`. Las consultas, el ETL y las tareas del DAG están en blanco: las escriben contigo. El tuyo, con las respuestas y la explicación de cada línea, es `clase03/notebooks/EstudIA_Clase03_PROFESOR.ipynb`. No compartas ese como plantilla.
+
+Súbele a Colab el de los estudiantes y pide: **Archivo → Guardar una copia en Drive**.
 
 Proyecta también Airflow en `https://airflow.34.95.210.33.sslip.io`. El usuario docente y su contraseña están solo en la VM, en `/root/estudia-clase03/secrets.env`, campo `AIRFLOW_ADMIN_PASSWORD`. No la pongas en una diapositiva.
 
@@ -8,7 +10,7 @@ Proyecta también Airflow en `https://airflow.34.95.210.33.sslip.io`. El usuario
 
 Di: «Hoy el resultado no se queda en la pantalla. Va a quedar programado».
 
-Abre la parte 1 del cuaderno. Muestra las dos consultas, pero todavía no las ejecutes: aún no hay conexión. Explica `HAVING` contra `WHERE`, y por qué el `ROW_NUMBER` se filtra en la CTE.
+Abre la parte 1 del cuaderno de los estudiantes. La celda está vacía. Escribe con ellos la consulta, mirando el cuaderno del profesor. Todavía no la ejecutes: aún no hay conexión. Explica `HAVING` contra `WHERE`, y por qué el `ROW_NUMBER` se filtra en la CTE.
 
 Deja 15 minutos para que relean los JOIN de la clase 02. Si alguien se adelanta, que pase a la parte 2.
 
@@ -34,11 +36,11 @@ Deja el cuaderno en la parte 4. No publiques todavía.
 
 ## 19:20 — ETL
 
-Ejecuta las cuatro funciones. El reporte local debe mostrar categorías y venta neta. Quien termine puede cambiar `categoria` por `canal` y volver a correr la celda.
+Escribe con ellos el cuerpo de las cuatro funciones. El reporte local debe mostrar categorías y venta neta. Quien termine puede cambiar `categoria` por `canal` y volver a correr la celda.
 
 ## 19:55 — El DAG
 
-Di: «si cierro Colab, esto se apaga. Airflow no». Muestra el diagrama que imprime `mostrar_diagrama()`. Recalca que al servidor no viaja código libre: viajan la consulta, la validación y el reporte.
+Di: «si cierro Colab, esto se apaga. Airflow no». Ellos completan `nombre`, `intervalo_minutos` y las cuatro `agregar_tarea`. Luego `mostrar_diagrama()`. Recalca que al servidor no viaja código libre: viajan la consulta, la validación y el reporte.
 
 ## 20:20 — Publicar
 
