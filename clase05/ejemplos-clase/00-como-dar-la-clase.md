@@ -1,34 +1,26 @@
-# Cómo dar la clase
+# Cómo dar la clase 05
 
-Tres horas, de 18:00 a 21:00. La pausa es de 19:05 a 19:15. Quien no tenga Docker a esa hora pasa a Colab y no espera.
+Los estudiantes escriben código. No descargan un Compose resuelto. La raíz del repositorio docente ya funciona: no la proyectes como atajo. Ellos abren `plantillas/`.
 
-No actives un cron en los 45 equipos. El DAG se dispara a mano.
+Quien no instala Docker sigue en `notebooks/EstudIA_Clase05_PRACTICA.ipynb`. Di en cada bloque que ese cuaderno no enciende contenedores.
 
-## 18:00 — Repaso de la API
+## 18:00 — API
 
-Di: "La API de la clase pasada sigue siendo de lectura. Hoy esa petición va a vivir dentro de un pipeline."
+Di: hay tres credenciales distintas. `admin` / `estudia-local` abre Airflow en el portátil. El usuario PostgreSQL abre la API. La base de metadatos de Docker no se toca.
 
-Abre:
+Abre Postman. `POST https://34.95.210.33.sslip.io/api/v4/auth/login`, sin auth, JSON con el usuario asignado. Esperas 200 y un `access_token`. Luego `GET /api/v4/auth/me` con Bearer. No se comparte el token.
 
-- Salud: `https://34.95.210.33.sslip.io/api/v4/health`. Esperado: `estudia-clase04`.
-- Swagger: `https://34.95.210.33.sslip.io/api/v4/docs`.
-- Postman, carpeta de ventas, `GET {{base_url}}/api/v4/ventas` con región Aragón.
+Colab: la primera celda de login usa `getpass()`.
 
-Pregunta: "¿El token va en la URL?" Respuesta: no, va en Authorization.
+## 18:10 — Qué es Docker
 
-Si salud no responde, no sigas con datos inventados. El cuaderno tiene respaldo marcado `RESPALDO`.
+Di: una imagen es la plantilla y un contenedor es esa plantilla en marcha. No es una máquina virtual. Docker Desktop incluye el motor. Compose describe varios contenedores. WSL2 es la capa de Linux en Windows.
 
-## 18:15 — Qué es Docker
+Pregunta: ¿`docker ps` muestra imágenes o contenedores? Respuesta: contenedores en marcha. `docker images` muestra plantillas. `docker ps -a` incluye los detenidos.
 
-Di: "Un contenedor es un proceso empaquetado con sus librerías. Airflow necesita varios procesos. Compose los levanta juntos."
+## 18:20 — Instalar
 
-Abre `ejemplos-clase/01-docker-fundamentos.md` y el `docker-compose.yml`. Señala api-server, scheduler, dag-processor y postgres. Di que postgres de esta pantalla no es la base del curso.
-
-## 18:30 — Instalación
-
-Proyecta la descarga oficial: `https://www.docker.com/products/docker-desktop/`.
-
-En PowerShell, y que lo copien:
+Windows: virtualización activa, WSL2, instalador de Docker Desktop, reinicio si lo pide, abrir la aplicación y esperar al motor.
 
 ```powershell
 docker --version
@@ -36,109 +28,104 @@ docker compose version
 docker run --rm hello-world
 ```
 
-Esperado: el cliente de Docker, Compose, y "Hello from Docker!".
+Error frecuente: el cliente existe y el motor no. Se espera a Docker Desktop. A las 19:05, quien siga instalando pasa a Colab.
 
-Luego, dentro de la carpeta descomprimida:
+## 18:45 — Dockerfile, YAML, Compose y .env
+
+Archivo: `plantillas/infraestructura/Dockerfile`.
+
+Di: `FROM` elige la base, `USER airflow` evita root, `RUN` crea una capa. No usamos `latest`.
+
+Respuestas: `apache/airflow:3.4.0`, `airflow`, `3.1.0`, `2.34.2`.
+
+Archivo: `plantillas/infraestructura/docker-compose.yml`. Muestra una línea corrida de indentación y di que Compose la rechaza.
+
+Respuestas, en este orden: `LocalExecutor`, `"4"`, `"1"`, `/opt/airflow/dags`, `/opt/airflow/logs`, `/opt/airflow/data`, `service_healthy`, `postgres:16.6`, `api-server`, `127.0.0.1`, `scheduler`, `dag-processor`.
+
+Di: LocalExecutor corre las tareas en el mismo equipo. Celery las reparte con una cola; aquí no hay Redis. PostgreSQL de este Compose es metadatos, no las ventas. `127.0.0.1` no publica la interfaz en la red. El volumen `./data` es el disco que el pipeline usará más tarde.
+
+Archivo: `plantillas/infraestructura/.env.example`. Respuestas: `8080`, `admin`, `estudia-local`. No se inventan FERNET ni JWT. No se escribe la clave de PostgreSQL.
+
+Colab: la celda de infraestructura pide los mismos textos y dice que no despliega.
+
+## 19:15 — Validar y desplegar
 
 ```powershell
+.\scripts\validar_infraestructura.ps1
+.\scripts\activar_infraestructura.ps1
 .\scripts\preparar.ps1
-```
-
-Eso crea `.env`, una clave Fernet y la imagen. Puede tardar porque baja `apache/airflow:3.4.0` y `postgres:16.6`.
-
-Errores frecuentes:
-
-- "Docker Desktop no responde": abrir la aplicación y esperar.
-- Virtualización apagada: activarla en la BIOS o en Windows.
-- WSL2 ausente: instalarlo con `wsl --install` y reiniciar.
-- Poca memoria: en Docker Desktop, Resources, 4 GB como mínimo.
-
-A quien se quede atascado, dile que abra el cuaderno de práctica. No lo dejes en el instalador después de la pausa.
-
-## 19:05 — Pausa
-
-Diez minutos. Deja tu `preparar` terminado.
-
-## 19:15 — Levantar Airflow
-
-```powershell
 .\scripts\iniciar.ps1
 .\scripts\comprobar.ps1
 ```
 
-Abre `http://127.0.0.1:8080`. Usuario `admin`. Contraseña `estudia-local`, salvo que la hayan cambiado en `.env`.
+Di: validar no construye si queda un hueco. Activar copia los archivos a la raíz. Preparar crea las claves y la imagen. Iniciar arranca Postgres, migra metadatos y levanta api-server, scheduler y dag-processor.
 
-Di: "Esta contraseña no entra a PostgreSQL del curso. Solo abre esta pantalla."
+```powershell
+docker compose ps
+docker compose logs --tail=50 airflow-scheduler
+```
 
-Si 8080 está ocupado, `AIRFLOW_WEB_PORT=8088` en `.env`, detener e iniciar otra vez. La URL pasa a `http://127.0.0.1:8088`.
+Error: puerto ocupado. Se cambia `AIRFLOW_WEB_PORT=8088` y se vuelve a iniciar. El triggerer down no es un fallo.
 
-Esperado en DAGs: `estudia_clase05_api_medallion` y `estudia_clase05_fallo_controlado`, los dos en pausa.
+Interfaz: `http://127.0.0.1:8080`, `admin`, `estudia-local`. Muestra DAGs, Graph, Grid, Runs y Connections.
 
-## 19:35 — Connection
+## 19:30 — Primer DAG
 
-Admin, Connections, signo más.
+Archivo: `plantillas/dags/estudia_clase05_mi_primer_dag.py`.
 
-| Campo | Qué escribir |
-|---|---|
-| Connection Id | `estudia_api` |
-| Connection Type | HTTP |
-| Host | `34.95.210.33.sslip.io` |
-| Schema | `https` |
-| Login | el usuario PostgreSQL |
-| Password | la contraseña de ese usuario |
-| Port | vacío |
+Respuestas: `estudia_clase05_mi_primer_dag`, `None`, `False`, `saludar`, `saludar`, `finalizar`, `finalizar`, y la línea `inicio >> fin`.
 
-Test no siempre existe en HTTP. No pegues el token en ningún campo. Guarda.
+```powershell
+.\scripts\validar_dags.ps1
+.\scripts\activar_dags.ps1
+```
 
-## 19:50 — De Postman al DAG
+Quita la pausa, Trigger, y lee los dos logs. No hace falta la API.
 
-En Postman abre el código, Python Requests. Di: "Eso es el borrador. Le quitamos la contraseña fija, le ponemos timeout y `raise_for_status`, y la credencial sale de la Connection."
+## 19:40 — Connection
 
-Abre `dags/estudia_clase05_practica.py`. Rellena en voz alta:
+Admin, Connections. Id `estudia_api`, tipo HTTP, host `34.95.210.33.sslip.io`, schema `https`, login y contraseña de cada estudiante. En el DAG, `BaseHook.get_connection("estudia_api")`. No se imprime `password`.
 
-- `RUTA_VENTAS = "/api/v4/ventas"`
-- `REGION = "Aragón"`
-- `PAGE_SIZE = "100"`
-- `PAGINAS = "2"`
-- `PREFIJO_AUTH = "Bearer"`
-- `COLUMNA_CATEGORIA = "categoria"`
-- `COLUMNA_REGION = "region"`
-- `REGLA_DUPLICADOS = "rechazar"`
-- `CADENA = "extraer_api>guardar_bronze>transformar_silver>validar_datos>generar_gold>exportar_reporte"`
+## 19:50 — HTTP y paginación
 
-El grafo ya muestra esas flechas. La cadena escrita evita que disparen la tarea con los huecos vacíos.
+En el mismo archivo de práctica: `access_token`, `Authorization`, `range(1, 3)`, región `Aragón`, `page` igual a `numero`, `page_size` `100`.
 
-## 20:10 — Medallion
+Di: dos páginas de 100 son 200 filas. Aragón tiene más registros; el alcance queda parcial. No se bajan las 50.000 ventas. `/ventas` es plano. `/ventas/muestra` es anidado y no se usa aquí.
 
-Abre `data/` cuando haya corrido, o explica las carpetas antes.
+## 20:05 — Medallion
 
-- Bronze: `pagina_1.json`, `pagina_2.json`, `cobertura.json`. Sin token.
-- Silver: `ventas.csv` con columnas planas.
-- Gold: sumas de esa extracción.
-- Reports: `manifiesto.json` con `alcance` parcial.
+Bronze guarda el JSON original. No se guarda el login. Silver: `data`, `ignore_index=True`, columna `fecha`, columna `importe_neto`. Validación: `id_transaccion` nulo y `id_transaccion` duplicado. No se borran filas ni se cambian negativos por cero. Gold: `categoria` con `sum`, `region` con `sum`.
 
-Di: "Dos páginas de Aragón no son el censo. El manifiesto lo dice."
+## 20:20 — Operadores, dependencias y XCom
 
-`/ventas/muestra` anida producto y tienda. No la metas en este groupby.
+Los estudiantes escriben los seis operadores y esta línea:
 
-## 20:25 — Ejecución
+```python
+t1 >> t2 >> t3 >> t4 >> t5 >> t6
+```
 
-Quita la pausa del DAG de práctica y pulsa Trigger. En Graph verás el orden. En Logs, códigos y conteos, no el token.
+`dag_id` `estudia_clase05_api_medallion`, `schedule=None`, `catchup=False`, `max_active_runs=1`, `retries` `1`.
 
-Esperado: las seis tareas en success. En `data/reports/<run_id>/manifiesto.json`, `filas` cerca de 200 y `alcance` parcial.
+XCom: bronze tira de `extraer_api` y validar tira de `transformar_silver`. Solo viaja el `run_id`. Los archivos viajan por `./data`, el volumen que escribieron en Compose.
 
-## 20:45 — Fallo, reintento y programación
+Vuelve a validar y activar. Un hueco impide copiar el archivo a `dags/`.
 
-Dispara `estudia_clase05_fallo_controlado`. Esperado: `up_for_retry` y luego `failed`. El log dice que el id está duplicado. El importe negativo del fixture no es la causa.
+## 20:35 — Ejecutar
 
-Di: "`catchup=False` evita que un DAG nuevo salga a correr el pasado. `max_active_runs=1` evita dos corridas a la vez. No pongan un cron igual en toda el aula."
+Abre `estudia_clase05_api_medallion`, quita la pausa, Trigger. Revisa Graph, Grid, logs y `data/bronze`, `data/silver`, `data/gold`, `data/reports`. Referencia de la corrida probada: 200 filas, 5.018 en el filtro, alcance parcial, promedio cerca de 1545. Los números pueden moverse si cambian los datos.
 
-Para apagar:
+## 20:45 — Fallo y horario
+
+El DAG `estudia_clase05_fallo_controlado` usa un archivo local con un id repetido. Muestra Failed y el reintento. Un duplicado no debe convertirse en un indicador.
+
+`schedule=None` es manual. `*/10 * * * *` sería cada diez minutos: no lo actives en los 45 equipos.
 
 ```powershell
 .\scripts\detener.ps1
 ```
 
-## 20:55 — Cierre
+`stop` apaga. `down` borra contenedores y conserva volúmenes. `down -v` borra también los metadatos. En la práctica se usa `stop`.
 
-Repite las tres rutas: Docker local, Colab si no hubo Docker, y la API que sigue siendo de lectura. El ZIP y el cuaderno de práctica se suben a Drive después, fuera de esta sesión. La solución de `profesor/` no se entrega.
+## Cierre
+
+Pregunta: ¿por qué el JSON de ventas aparece en la carpeta `data` de tu portátil? Respuesta: porque el Compose monta `./data` dentro del contenedor.

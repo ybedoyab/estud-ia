@@ -8,12 +8,13 @@ if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
 
 $incluir = @(
-    "README.md", "docker-compose.yml", "Dockerfile", "requirements.txt",
-    ".env.example", ".dockerignore", "dags", "plantillas", "fixtures", "scripts"
+    "README.md", "requirements.txt", ".dockerignore", "plantillas", "fixtures", "scripts"
 )
 foreach ($item in $incluir) {
     Copy-Item $item -Destination (Join-Path $stage $item) -Recurse -Force
 }
+New-Item -ItemType Directory -Force -Path (Join-Path $stage "dags") | Out-Null
+Copy-Item "dags\estudia_clase05_fallo_controlado.py" (Join-Path $stage "dags\estudia_clase05_fallo_controlado.py")
 
 # Montajes vacios. No se copian corridas, logs ni la clave local.
 foreach ($capa in @("bronze", "silver", "gold", "reports", "staging")) {

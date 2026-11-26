@@ -24,9 +24,13 @@ Windows, dentro de `clase05` o de la carpeta descomprimida:
 docker --version
 docker compose version
 docker run --rm hello-world
+.\scripts\validar_infraestructura.ps1
+.\scripts\activar_infraestructura.ps1
 .\scripts\preparar.ps1
 .\scripts\iniciar.ps1
 .\scripts\comprobar.ps1
+.\scripts\validar_dags.ps1
+.\scripts\activar_dags.ps1
 .\scripts\detener.ps1
 ```
 
@@ -65,15 +69,23 @@ ZIP: `.\scripts\empaquetar.ps1`. Sale en `clase05/dist/EstudIA_Clase05_laborator
 | Password | la de PostgreSQL |
 | Port | vacío |
 
+## Práctica y solucionario
+
+Los estudiantes completan `plantillas/infraestructura/` y `plantillas/dags/`. El ZIP no trae el Dockerfile ni el Compose resueltos en la raíz. El docente los tiene en la raíz de `clase05/` y en `profesor/infraestructura/`. Las respuestas están en `profesor/SOLUCIONARIO.md`.
+
+Primer DAG: `estudia_clase05_mi_primer_dag`, tareas `saludar` y `finalizar`, línea `inicio >> fin`.
+
 ## DAG
 
 `estudia_clase05_api_medallion`
+
+Los estudiantes escriben los seis operadores y la línea `t1 >> t2 >> t3 >> t4 >> t5 >> t6`.
 
 `extraer_api → guardar_bronze → transformar_silver → validar_datos → generar_gold → exportar_reporte`
 
 `schedule=None`, `catchup=False`, `max_active_runs=1`, un reintento, nace en pausa.
 
-Huecos del archivo de práctica: ruta `/api/v4/ventas`, región `Aragón`, `page_size` `100`, páginas `2`, prefijo `Bearer`, columnas `categoria` y `region`, regla `rechazar`, cadena `extraer_api>guardar_bronze>transformar_silver>validar_datos>generar_gold>exportar_reporte`.
+Huecos principales: `apache/airflow:3.4.0`, `airflow`, pandas `3.1.0`, requests `2.34.2`, `postgres:16.6`, `LocalExecutor`, comandos `api-server`, `scheduler` y `dag-processor`, `127.0.0.1`, volúmenes `/opt/airflow/dags`, `/opt/airflow/logs` y `/opt/airflow/data`, Connection `estudia_api`, `access_token`, `Authorization`, `Aragón`, `page_size` 100, dos páginas, `data`, `fecha`, `importe_neto`, `id_transaccion`, `categoria`, `region`, `sum`.
 
 ## Rutas de datos
 
@@ -101,3 +113,5 @@ Docker Desktop 4.92, motor 29.8.0. La imagen ocupa 3.22 GB en disco y Postgres 1
 ## Lo que no se vio en pantalla
 
 No se abrió el navegador en `http://127.0.0.1:8080` ni la ventana de Docker Desktop. El cuaderno del profesor se ejecutó con nbclient, no dentro de colab.google.com. El DAG no se instaló en la VM de la clase 03.
+
+La práctica nueva se probó descomprimiendo el ZIP en una carpeta aparte, completando las plantillas y levantando ese proyecto en `127.0.0.1:8088`. El primer DAG terminó en success con los dos logs. El pipeline devolvió 200 filas, alcance parcial y 5018 registros en el filtro. El fallo controlado llegó a `failed` en el intento 2. Tras `docker compose stop` y un nuevo arranque, el manifiesto y la corrida seguían. No se usó `down -v`.

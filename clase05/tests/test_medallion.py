@@ -10,7 +10,7 @@ RAIZ = Path(__file__).resolve().parents[1]
 
 
 def cargar_practica():
-    ruta = RAIZ / "dags" / "estudia_clase05_practica.py"
+    ruta = RAIZ / "profesor" / "dags" / "estudia_clase05_practica.py"
     spec = importlib.util.spec_from_file_location("practica_clase05", ruta)
     modulo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(modulo)
@@ -64,30 +64,21 @@ def test_duplicado_detiene_antes_de_gold(datos):
     assert not (datos / "gold" / "falla").exists()
 
 
-def test_practica_vacia_no_llama_la_api(datos, monkeypatch):
-    modulo = cargar_practica()
-    monkeypatch.delenv("ESTUDIA_FIXTURE", raising=False)
-
-    def prohibido(*_args, **_kwargs):
-        raise AssertionError("no debe llamar a la red")
-
-    monkeypatch.setattr(modulo.requests, "post", prohibido)
-    with pytest.raises(RuntimeError, match="Completa"):
-        modulo.extraer_api(run_id="vacio", ti=None)
+def test_plantilla_no_entra_a_dags_y_trae_huecos():
+    plantilla = (RAIZ / "plantillas" / "dags" / "estudia_clase05_practica.py").read_text(encoding="utf-8")
+    primero = (RAIZ / "plantillas" / "dags" / "estudia_clase05_mi_primer_dag.py").read_text(encoding="utf-8")
+    assert "COMPLETA" in plantilla
+    assert "COMPLETA" in primero
+    resuelta_en_dags = (RAIZ / "dags" / "estudia_clase05_practica.py").read_text(encoding="utf-8")
+    assert "COMPLETA" not in resuelta_en_dags
+    assert plantilla != resuelta_en_dags
+    assert not any(linea.strip() == "t1 >> t2 >> t3 >> t4 >> t5 >> t6" for linea in plantilla.splitlines())
+    assert not any(linea.strip() == "inicio >> fin" for linea in primero.splitlines())
 
 
 def test_practica_rellena_con_fixture(datos, monkeypatch):
     monkeypatch.setenv("ESTUDIA_FIXTURE", str(RAIZ / "fixtures" / "ventas_ok.json"))
     modulo = cargar_practica()
-    modulo.CADENA = modulo.CADENA_ESPERADA
-    modulo.RUTA_VENTAS = "/api/v4/ventas"
-    modulo.REGION = "Aragón"
-    modulo.PAGE_SIZE = "100"
-    modulo.PAGINAS = "2"
-    modulo.PREFIJO_AUTH = "Bearer"
-    modulo.COLUMNA_CATEGORIA = "categoria"
-    modulo.COLUMNA_REGION = "region"
-    modulo.REGLA_DUPLICADOS = "rechazar"
 
     class Bandeja:
         def __init__(self):
@@ -126,9 +117,8 @@ def test_archivos_python_compilan_y_no_guardan_secretos():
             assert marca not in texto, ruta.name
         if ruta.suffix == ".py":
             ast.parse(texto)
-    practica = (RAIZ / "dags" / "estudia_clase05_practica.py").read_text(encoding="utf-8")
-    plantilla = (RAIZ / "plantillas" / "estudia_clase05_practica.py").read_text(encoding="utf-8")
-    assert practica == plantilla
-    assert "COMPLETA" in practica
     profesor = (RAIZ / "profesor" / "estudia_clase05_profesor.py").read_text(encoding="utf-8")
+    resuelta = (RAIZ / "profesor" / "dags" / "estudia_clase05_practica.py").read_text(encoding="utf-8")
     assert "COMPLETA" not in profesor
+    assert "COMPLETA" not in resuelta
+    assert "t1 >> t2 >> t3 >> t4 >> t5 >> t6" in resuelta

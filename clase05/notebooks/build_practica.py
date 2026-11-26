@@ -80,7 +80,58 @@ print("usuario listo", usuario)
 
 PASOS = [
     (
-        """## 00 — La misma API
+        """## 00 — Leer la infraestructura, sin desplegarla
+
+Completa estos textos. No levantan contenedores: solo comprueban que reconoces la imagen, el ejecutor, el comando, el puerto y el volumen. En Docker haras lo mismo dentro de los archivos.
+""",
+        '''
+imagen = "COMPLETA"
+ejecutor = "COMPLETA"
+comando_scheduler = "COMPLETA"
+escucha_en = "COMPLETA"
+volumen_dags = "COMPLETA"
+dependencia = "COMPLETA"
+listo(imagen)
+listo(ejecutor)
+listo(comando_scheduler)
+listo(escucha_en)
+listo(volumen_dags)
+listo(dependencia)
+esperado = {
+    "imagen": "apache/airflow:3.4.0",
+    "ejecutor": "LocalExecutor",
+    "comando_scheduler": "scheduler",
+    "escucha_en": "127.0.0.1",
+    "volumen_dags": "/opt/airflow/dags",
+    "dependencia": "t1 >> t2 >> t3 >> t4 >> t5 >> t6",
+}
+if imagen != esperado["imagen"] or ejecutor != esperado["ejecutor"]:
+    raise RuntimeError("Revisa imagen y ejecutor.")
+if comando_scheduler != esperado["comando_scheduler"] or escucha_en != esperado["escucha_en"]:
+    raise RuntimeError("Revisa el comando del scheduler y la direccion.")
+if volumen_dags != esperado["volumen_dags"] or dependencia != esperado["dependencia"]:
+    raise RuntimeError("Revisa el volumen y la cadena de operadores.")
+print("infraestructura leida")
+''',
+        '''
+imagen = "apache/airflow:3.4.0"
+ejecutor = "LocalExecutor"
+comando_scheduler = "scheduler"
+escucha_en = "127.0.0.1"
+volumen_dags = "/opt/airflow/dags"
+dependencia = "t1 >> t2 >> t3 >> t4 >> t5 >> t6"
+listo(imagen)
+listo(ejecutor)
+listo(comando_scheduler)
+listo(escucha_en)
+listo(volumen_dags)
+listo(dependencia)
+print("infraestructura leida", imagen, ejecutor, dependencia)
+''',
+        "Esto no crea contenedores. Quien instalo Docker escribe los mismos valores en las plantillas.",
+    ),
+    (
+        """## 01 — La misma API
 
 Comprueba salud antes de armar el pipeline. Si no responde, el docente puede autorizar el respaldo. Ese modo no es Airflow y no es la API.
 """,
@@ -225,8 +276,8 @@ listo(regla)
 listo(cadena)
 if regla != "rechazar":
     raise RuntimeError("La regla es rechazar duplicados.")
-if cadena != "extraer_api>guardar_bronze>transformar_silver>validar_datos>generar_gold>exportar_reporte":
-    raise RuntimeError("Escribe la cadena de tareas en ese orden, separada por >.")
+if cadena != "t1 >> t2 >> t3 >> t4 >> t5 >> t6":
+    raise RuntimeError("Escribe la linea t1 >> t2 >> t3 >> t4 >> t5 >> t6.")
 bronze = RAIZ / "bronze" / "notebook"
 bronze.mkdir(parents=True, exist_ok=True)
 for pagina in paginas_json:
@@ -256,15 +307,15 @@ print(por_region.head(3).to_string(index=False))
 columna_categoria = "categoria"
 columna_region = "region"
 regla = "rechazar"
-cadena = "extraer_api>guardar_bronze>transformar_silver>validar_datos>generar_gold>exportar_reporte"
+cadena = "t1 >> t2 >> t3 >> t4 >> t5 >> t6"
 listo(columna_categoria)
 listo(columna_region)
 listo(regla)
 listo(cadena)
 if regla != "rechazar":
     raise RuntimeError("La regla es rechazar duplicados.")
-if cadena != "extraer_api>guardar_bronze>transformar_silver>validar_datos>generar_gold>exportar_reporte":
-    raise RuntimeError("Escribe la cadena de tareas en ese orden, separada por >.")
+if cadena != "t1 >> t2 >> t3 >> t4 >> t5 >> t6":
+    raise RuntimeError("Escribe la linea t1 >> t2 >> t3 >> t4 >> t5 >> t6.")
 bronze = RAIZ / "bronze" / "notebook"
 bronze.mkdir(parents=True, exist_ok=True)
 for pagina in paginas_json:
@@ -307,9 +358,9 @@ Esto ejecuta funciones de Python. No levanta Airflow ni Docker.
         else """# EstudIA — Clase 05
 ## La misma práctica, sin Docker
 
-Si no pudiste instalar Docker, recorre aquí el pipeline. Donde dice `COMPLETA`, escribe lo mismo que en Postman y en el DAG.
+Si no pudiste instalar Docker, empieza por reconocer imagen, puerto y volumen. Después recorre el mismo pipeline. Donde dice `COMPLETA`, escribe el valor de la práctica.
 
-Guardar una copia en Drive y ejecutar hacia abajo. La contraseña no se imprime. Esto no es una instancia de Airflow.
+Guardar una copia en Drive y ejecutar hacia abajo. La contraseña no se imprime. Completar estos textos no despliega contenedores ni deja Airflow encendido.
 """
     )
     celdas = [md(titulo), md("## Preparación\n\nPide el usuario de PostgreSQL. Sirve `estudianteNN` o `estudiante`."), code(PREPARACION)]

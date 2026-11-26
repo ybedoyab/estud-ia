@@ -1,8 +1,8 @@
 # EstudIA — Clase 05
 
-Airflow local con Docker y un pipeline Medallion sobre la API de la clase 04.
+Práctica para construir Docker, Airflow y un pipeline Medallion. Los archivos con huecos están en `plantillas/`. La raíz de este repositorio ya trae la infraestructura y los DAG resueltos para el docente. El ZIP del estudiante no los incluye.
 
-La interfaz queda en [http://127.0.0.1:8080](http://127.0.0.1:8080). Si ese puerto está ocupado, `AIRFLOW_WEB_PORT` en `.env` cambia la URL que muestran `iniciar` y `comprobar`. No hace falta Git ni Python instalados en el portátil: Docker Desktop basta. Si Docker no se puede instalar, el camino es `notebooks/EstudIA_Clase05_PRACTICA.ipynb`.
+La interfaz, cuando el entorno ya está arriba, queda en [http://127.0.0.1:8080](http://127.0.0.1:8080). Si ese puerto está ocupado, cambia `AIRFLOW_WEB_PORT`. No hace falta Git ni Python en el portátil. Si Docker no se puede instalar, el camino es `notebooks/EstudIA_Clase05_PRACTICA.ipynb`. Completar ese cuaderno no despliega contenedores.
 
 ## Versiones fijadas
 
@@ -13,23 +13,23 @@ La interfaz queda en [http://127.0.0.1:8080](http://127.0.0.1:8080). Si ese puer
 | Pandas | 3.1.0 |
 | Requests | 2.34.2 |
 
-No se usa la etiqueta `latest`. No hay Redis ni Celery.
+No se usa `latest`. No hay Redis ni Celery.
 
-## Orden
+## Orden del estudiante
 
-```powershell
-cd clase05
-.\scripts\preparar.ps1
-.\scripts\iniciar.ps1
-.\scripts\comprobar.ps1
-```
+1. Completar `plantillas/infraestructura/`.
+2. `.\scripts\validar_infraestructura.ps1`
+3. `.\scripts\activar_infraestructura.ps1`
+4. `.\scripts\preparar.ps1`, `.\scripts\iniciar.ps1`, `.\scripts\comprobar.ps1`
+5. Completar `plantillas/dags/`.
+6. `.\scripts\validar_dags.ps1` y `.\scripts\activar_dags.ps1`
 
-En Linux o macOS: `./scripts/preparar.sh`, `./scripts/iniciar.sh`, `./scripts/comprobar.sh`.
+En Linux o macOS los mismos nombres terminan en `.sh`.
 
-Usuario de la interfaz: `admin`. Contraseña: `AIRFLOW_ADMIN_PASSWORD` de `.env` (`estudia-local` si no la cambias). Esa clave solo abre Airflow en tu máquina.
+Usuario de la interfaz: `admin`. Contraseña inicial: `estudia-local`. Esa clave solo abre Airflow en tu máquina. No es el usuario de PostgreSQL ni el de la API.
 
-Connection `estudia_api`: tipo HTTP, host `34.95.210.33.sslip.io`, schema `https`, login y contraseña de PostgreSQL. El DAG `estudia_clase05_api_medallion` nace en pausa.
+Connection `estudia_api`: tipo HTTP, host `34.95.210.33.sslip.io`, schema `https`, tu login y tu contraseña de PostgreSQL. El DAG nace en pausa.
 
-Para apagar: `.\scripts\detener.ps1`.
+Para apagar: `.\scripts\detener.ps1`. No uses `docker compose down -v` durante la práctica: borra los metadatos.
 
-El ZIP para quien no clona el repositorio se arma con `.\scripts\empaquetar.ps1`. No incluye la solución de `profesor/`.
+El ZIP estudiantil se arma con `.\scripts\empaquetar.ps1`. No incluye `profesor/`.

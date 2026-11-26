@@ -32,14 +32,19 @@ El DAG resuelto no se copió a la VM de la clase 03. Esa instancia sigue sirvien
 
 | Hora | Bloque |
 |---|---|
-| 18:00 | Repaso de la API |
-| 18:15 | Docker |
-| 18:30 | Instalación |
-| 19:05 | Pausa |
-| 19:15 | Airflow |
-| 19:35 | Interfaz y Connection |
-| 19:50 | Postman a Python y DAG |
-| 20:10 | Medallion |
-| 20:25 | Ejecución |
-| 20:45 | Programación, fallos y reintentos |
-| 20:55 | Cierre |
+| 18:00–18:10 | Repaso de API y autenticación en Postman |
+| 18:10–18:20 | Docker, imágenes y contenedores |
+| 18:20–18:45 | Instalación de Docker |
+| 18:45–19:05 | Dockerfile, YAML, Compose y .env |
+| 19:05–19:15 | Descanso |
+| 19:15–19:30 | Validación, construcción y despliegue |
+| 19:30–19:40 | Primer DAG de dos tareas |
+| 19:40–19:50 | Connections y autenticación individual |
+| 19:50–20:05 | Extracción HTTP y paginación |
+| 20:05–20:20 | Bronze, Silver, validación y Gold |
+| 20:20–20:35 | Operadores, dependencias y XCom |
+| 20:35–20:45 | Ejecutar el DAG y comprobar resultados |
+| 20:45–20:55 | Fallos, reintentos y programación |
+| 20:55–21:00 | Cierre |
+
+El guion hablado está en `ejemplos-clase/00-como-dar-la-clase.md`. Las respuestas están en `profesor/SOLUCIONARIO.md`.

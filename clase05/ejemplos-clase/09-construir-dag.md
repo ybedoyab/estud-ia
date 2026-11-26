@@ -1,13 +1,15 @@
 # El DAG
 
-Identificador: `estudia_clase05_api_medallion`.
+Los estudiantes no reciben el grafo ya unido. Escriben los operadores en `plantillas/dags/estudia_clase05_practica.py` y esta línea:
 
-Archivo de práctica: `dags/estudia_clase05_practica.py`. También está en `plantillas/` por si hay que empezar de cero. Sustituir `COMPLETA` no rompe el import: el DAG aparece igual. La corrida se detiene hasta que los campos estén escritos.
+```python
+t1 >> t2 >> t3 >> t4 >> t5 >> t6
+```
 
-Tareas, en este orden:
+Identificador: `estudia_clase05_api_medallion`. `schedule=None`, `catchup=False`, `max_active_runs=1`, un reintento, nace en pausa.
 
-`extraer_api > guardar_bronze > transformar_silver > validar_datos > generar_gold > exportar_reporte`
+Tareas: `extraer_api`, `guardar_bronze`, `transformar_silver`, `validar_datos`, `generar_gold`, `exportar_reporte`.
 
-`schedule=None`, `catchup=False`, `max_active_runs=1`, un reintento, nace en pausa.
+`.\scripts\validar_dags.ps1` rechaza huecos. `.\scripts\activar_dags.ps1` comprueba la sintaxis dentro del contenedor y solo entonces copia el archivo a `dags/`.
 
-La solución de referencia está en `profesor/estudia_clase05_profesor.py`. No se entrega en el ZIP. Para probarla en local, aparta el archivo de práctica y copia el del profesor a `dags/`. No los dejes juntos: los dos usan el mismo `dag_id`.
+La solución de referencia está en `profesor/dags/estudia_clase05_practica.py`. No se entrega en el ZIP. No la dejes junto a otra copia con el mismo `dag_id`.
