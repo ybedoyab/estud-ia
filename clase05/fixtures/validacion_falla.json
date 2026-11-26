@@ -1,0 +1,28 @@
+{
+  "paginas": [
+    {
+      "numero": 1,
+      "filas": 2,
+      "has_next": false,
+      "cuerpo": {
+        "data": [
+          {"id_transaccion": 1, "fecha": "2024-01-01", "cantidad": 1, "importe_neto": 10.0, "categoria": "Ropa", "region": "Aragón"},
+          {"id_transaccion": 1, "fecha": "2024-01-02", "cantidad": 2, "importe_neto": -3.5, "categoria": "Ropa", "region": "Aragón"}
+        ],
+        "pagination": {"page": 1, "page_size": 100, "total_records": 2, "total_pages": 1, "has_next": false}
+      }
+    }
+  ],
+  "cobertura": {
+    "extraido_en": "2026-11-26T00:00:00+00:00",
+    "filtros": {"region": "Aragón"},
+    "page_size": 100,
+    "paginas": [{"page": 1, "filas": 2, "has_next": false}],
+    "filas": 2,
+    "total_records": 2,
+    "total_pages": 1,
+    "alcance": "completo",
+    "fuente": "fixture",
+    "nota": "El importe negativo no es el fallo. El fallo es el id_transaccion duplicado."
+  }
+}

@@ -21,6 +21,22 @@ clase04/.secrets/
 clase04/**/.env
 clase04/**/secrets.env
 
+# Clase 05. Secretos locales, metadatos y salidas. Nunca versionar.
+clase05/.env
+clase05/config/simple_auth_passwords.json
+clase05/logs/
+clase05/dist/
+clase05/data/bronze/**
+!clase05/data/bronze/.gitkeep
+clase05/data/silver/**
+!clase05/data/silver/.gitkeep
+clase05/data/gold/**
+!clase05/data/gold/.gitkeep
+clase05/data/reports/**
+!clase05/data/reports/.gitkeep
+clase05/data/staging/**
+!clase05/data/staging/.gitkeep
+
 # Python
 __pycache__/
 *.py[cod]
