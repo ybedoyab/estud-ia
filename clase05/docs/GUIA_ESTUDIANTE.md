@@ -98,11 +98,11 @@ inicio >> fin
 ```
 
 ```powershell
-.\scripts\validar_dags.ps1
-.\scripts\activar_dags.ps1
+.\scripts\validar_dags.ps1 primero
+.\scripts\activar_dags.ps1 primero
 ```
 
-En la interfaz quita la pausa, pulsa Trigger y lee los dos logs.
+El pipeline puede seguir incompleto: este comando no lo copia. En la interfaz quita la pausa, pulsa Trigger y lee los dos logs.
 
 ## 08 — Connection y API
 
@@ -144,7 +144,12 @@ Las seis tareas, en orden: `extraer_api`, `guardar_bronze`, `transformar_silver`
 t1 >> t2 >> t3 >> t4 >> t5 >> t6
 ```
 
-Vuelve a validar y activar. Quita la pausa y dispara. Debes ver unas 200 filas, alcance parcial y la carpeta `data/` en tu máquina, porque montaste `./data:/opt/airflow/data`.
+```powershell
+.\scripts\validar_dags.ps1 pipeline
+.\scripts\activar_dags.ps1 pipeline
+```
+
+Quita la pausa y dispara. Debes ver unas 200 filas, alcance parcial y la carpeta `data/` en tu máquina, porque montaste `./data:/opt/airflow/data`.
 
 El DAG `estudia_clase05_fallo_controlado` falla a propósito por un id duplicado en un archivo local. No llama a la API.
 

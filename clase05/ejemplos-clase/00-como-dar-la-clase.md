@@ -76,11 +76,11 @@ Archivo: `plantillas/dags/estudia_clase05_mi_primer_dag.py`.
 Respuestas: `estudia_clase05_mi_primer_dag`, `None`, `False`, `saludar`, `saludar`, `finalizar`, `finalizar`, y la línea `inicio >> fin`.
 
 ```powershell
-.\scripts\validar_dags.ps1
-.\scripts\activar_dags.ps1
+.\scripts\validar_dags.ps1 primero
+.\scripts\activar_dags.ps1 primero
 ```
 
-Quita la pausa, Trigger, y lee los dos logs. No hace falta la API.
+Ese argumento no mira el pipeline. Puede seguir con `COMPLETA` y no entra en `dags/`. En Linux o macOS: `./scripts/validar_dags.sh primero` y `./scripts/activar_dags.sh primero`. Quita la pausa, Trigger, y lee los dos logs. No hace falta la API.
 
 ## 19:40 — Connection
 
@@ -108,7 +108,12 @@ t1 >> t2 >> t3 >> t4 >> t5 >> t6
 
 XCom: bronze tira de `extraer_api` y validar tira de `transformar_silver`. Solo viaja el `run_id`. Los archivos viajan por `./data`, el volumen que escribieron en Compose.
 
-Vuelve a validar y activar. Un hueco impide copiar el archivo a `dags/`.
+```powershell
+.\scripts\validar_dags.ps1 pipeline
+.\scripts\activar_dags.ps1 pipeline
+```
+
+En Linux o macOS: `./scripts/validar_dags.sh pipeline` y `./scripts/activar_dags.sh pipeline`. Sin argumento, los dos scripts siguen revisando los dos DAG. Un hueco del pipeline no impide el primer DAG, y un hueco del pipeline impide copiar solo ese archivo a `dags/`.
 
 ## 20:35 — Ejecutar
 

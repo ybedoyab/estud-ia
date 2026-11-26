@@ -29,12 +29,16 @@ docker run --rm hello-world
 .\scripts\preparar.ps1
 .\scripts\iniciar.ps1
 .\scripts\comprobar.ps1
-.\scripts\validar_dags.ps1
-.\scripts\activar_dags.ps1
+.\scripts\validar_dags.ps1 primero
+.\scripts\activar_dags.ps1 primero
+.\scripts\validar_dags.ps1 pipeline
+.\scripts\activar_dags.ps1 pipeline
 .\scripts\detener.ps1
 ```
 
-Linux y macOS: `./scripts/preparar.sh`, `./scripts/iniciar.sh`, `./scripts/comprobar.sh`, `./scripts/detener.sh`.
+A las 19:30 se usa `primero`. El pipeline puede seguir con huecos y no se copia a `dags/`. A las 20:20 se usa `pipeline`. Sin argumento, `validar_dags` y `activar_dags` siguen revisando los dos archivos.
+
+Linux y macOS: `./scripts/preparar.sh`, `./scripts/iniciar.sh`, `./scripts/comprobar.sh`, `./scripts/validar_dags.sh primero`, `./scripts/activar_dags.sh primero`, `./scripts/validar_dags.sh pipeline`, `./scripts/activar_dags.sh pipeline`, `./scripts/detener.sh`.
 
 Health esperado: `http://127.0.0.1:8080/api/v2/monitor/health`.
 
