@@ -2,7 +2,7 @@
 
 Airflow local con Docker y un pipeline Medallion sobre la API de la clase 04.
 
-La interfaz queda en [http://127.0.0.1:8080](http://127.0.0.1:8080). No hace falta Git ni Python instalados en el portátil: Docker Desktop basta. Si Docker no se puede instalar, el camino es `notebooks/EstudIA_Clase05_PRACTICA.ipynb`.
+La interfaz queda en [http://127.0.0.1:8080](http://127.0.0.1:8080). Si ese puerto está ocupado, `AIRFLOW_WEB_PORT` en `.env` cambia la URL que muestran `iniciar` y `comprobar`. No hace falta Git ni Python instalados en el portátil: Docker Desktop basta. Si Docker no se puede instalar, el camino es `notebooks/EstudIA_Clase05_PRACTICA.ipynb`.
 
 ## Versiones fijadas
 

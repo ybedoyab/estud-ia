@@ -49,7 +49,7 @@ if ($texto -notmatch "(?m)^JWT_SECRET=.+" -or $texto -match "JWT_SECRET=cambia-e
 $clave = "estudia-local"
 foreach ($linea in Get-Content ".env") {
     if ($linea -like "AIRFLOW_ADMIN_PASSWORD=*") {
-        $clave = $linea.Substring(24)
+        $clave = $linea.Substring("AIRFLOW_ADMIN_PASSWORD=".Length)
     }
 }
 New-Item -ItemType Directory -Force -Path "config" | Out-Null

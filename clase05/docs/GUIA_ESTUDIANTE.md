@@ -34,7 +34,7 @@ cd C:\estudia-clase05
 
 Abre [http://127.0.0.1:8080](http://127.0.0.1:8080). Usuario `admin`. Contraseña la de `.env`, de salida `estudia-local`.
 
-Si el puerto 8080 está ocupado, cambia `AIRFLOW_WEB_PORT=8088` en `.env` y vuelve a iniciar.
+Si el puerto 8080 está ocupado, cambia `AIRFLOW_WEB_PORT=8088` en `.env` y vuelve a iniciar. `iniciar` y `comprobar` leen ese valor.
 
 ## 3. Connection
 

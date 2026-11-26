@@ -7,5 +7,10 @@ if [[ ! -f .env || ! -f config/simple_auth_passwords.json ]]; then
 fi
 docker compose up airflow-init
 docker compose up -d
-echo "Abre http://127.0.0.1:8080 cuando el api-server este healthy."
+puerto="8080"
+valor="$(grep '^AIRFLOW_WEB_PORT=' .env | head -n 1 | cut -d= -f2- | tr -d '[:space:]' || true)"
+if [[ -n "${valor}" ]]; then
+  puerto="$valor"
+fi
+echo "Abre http://127.0.0.1:${puerto} cuando el api-server este healthy."
 echo "Usuario: admin. Contrasena: la de AIRFLOW_ADMIN_PASSWORD en .env"

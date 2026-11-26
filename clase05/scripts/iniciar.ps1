@@ -11,5 +11,13 @@ docker compose up airflow-init
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 docker compose up -d
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-Write-Host "Abre http://127.0.0.1:8080 cuando el api-server este healthy."
+
+$puerto = "8080"
+foreach ($linea in Get-Content ".env") {
+    if ($linea -like "AIRFLOW_WEB_PORT=*") {
+        $valor = $linea.Substring(17).Trim()
+        if ($valor) { $puerto = $valor }
+    }
+}
+Write-Host "Abre http://127.0.0.1:$puerto cuando el api-server este healthy."
 Write-Host "Usuario: admin. Contrasena: la de AIRFLOW_ADMIN_PASSWORD en .env"
