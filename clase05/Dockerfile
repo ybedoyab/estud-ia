@@ -1,4 +1,5 @@
 FROM apache/airflow:3.4.0
 
 USER airflow
-RUN pip install --no-cache-dir "pandas==2.2.3" "requests==2.32.3"
+# La imagen ya trae estas versiones. Bajarlas choca con los proveedores incluidos.
+RUN pip install --no-cache-dir "pandas==3.1.0" "requests==2.34.2"

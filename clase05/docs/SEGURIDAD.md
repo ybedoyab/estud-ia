@@ -9,7 +9,7 @@ Hay cuatro identidades distintas:
 | `airflow` / `estudia_meta_local` | PostgreSQL de Compose, sin puerto | Metadatos de Airflow |
 | Dataset del curso | GCP, ya existente | Lectura. Esta clase no cambia permisos |
 
-La Connection guarda usuario y contraseña cifrados con `FERNET_KEY`, que `preparar` escribe en `.env` y no se versiona. El archivo `config/simple_auth_passwords.json` tampoco.
+La Connection guarda usuario y contraseña cifrados con `FERNET_KEY`, que `preparar` escribe en `.env` y no se versiona. El mismo archivo guarda `JWT_SECRET`, la clave con la que el scheduler habla con el API server. Sin esa clave compartida las tareas fallan antes de ejecutar el Python. El archivo `config/simple_auth_passwords.json` tampoco. Airflow 3.4 abre ese archivo en modo de escritura, así que el volumen no puede ser de solo lectura. Sigue estando solo en el portátil.
 
 Cada corrida pide un token con POST y lo descarta al terminar la extracción. No se imprime, no va en XCom y no se escribe en bronze. Un fallo de login registra el código HTTP, no el cuerpo.
 

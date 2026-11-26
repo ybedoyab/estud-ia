@@ -1,4 +1,4 @@
 # La imagen ya trae Airflow. Este archivo fija lo que agrega el Dockerfile.
 # No instala Airflow en el portatil del estudiante.
-pandas==2.2.3
-requests==2.32.3
+pandas==3.1.0
+requests==2.34.2

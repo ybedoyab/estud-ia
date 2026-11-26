@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from airflow import DAG
 from airflow.hooks.base import BaseHook
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 from pipeline.medallion import (
     base_de,

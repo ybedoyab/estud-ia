@@ -9,8 +9,8 @@ Material para armar las diapositivas. Lo no probado en pantalla está dicho como
 | Airflow | `apache/airflow:3.4.0` |
 | Ejecutor | LocalExecutor |
 | Metadatos | `postgres:16.6`, sin puerto publicado, clave local `estudia_meta_local` |
-| Pandas | 2.2.3 |
-| Requests | 2.32.3 |
+| Pandas | 3.1.0 |
+| Requests | 2.34.2 |
 | Interfaz | `http://127.0.0.1:8080` |
 | API | `https://34.95.210.33.sslip.io/api/v4` |
 
@@ -92,6 +92,12 @@ Resultado medido contra la API el 26 de noviembre de 2026, con el usuario compar
 
 `/ventas` es plano. `/ventas/muestra` anida `producto` y `tienda`. El pipeline usa `/ventas`.
 
+## Lo que sí corrió en Docker
+
+Docker Desktop 4.92, motor 29.8.0. La imagen ocupa 3.22 GB en disco y Postgres 16.6 ocupa 617 MB. En marcha, los cuatro contenedores usaron alrededor de 1 GB de los 7.44 GiB de la VM.
+
+`preparar`, `iniciar`, el health de `127.0.0.1:8080`, la corrida del profesor y el apagado se probaron por consola. La corrida dejó 200 filas, alcance parcial y 5018 en el filtro. El health marca el triggerer como down: este laboratorio no lo usa.
+
 ## Lo que no se vio en pantalla
 
-No se construyó la imagen ni se abrió Airflow: Docker Desktop estaba apagado. `docker compose config` sí validó el archivo. El cuaderno del profesor se ejecutó con nbclient, no dentro de colab.google.com. El DAG no se instaló en la VM de la clase 03.
+No se abrió el navegador en `http://127.0.0.1:8080` ni la ventana de Docker Desktop. El cuaderno del profesor se ejecutó con nbclient, no dentro de colab.google.com. El DAG no se instaló en la VM de la clase 03.

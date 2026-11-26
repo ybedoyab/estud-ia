@@ -10,7 +10,7 @@ from pathlib import Path
 import pandas as pd
 
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 COLUMNAS = ["id_transaccion", "fecha", "cantidad", "importe_neto", "categoria", "region"]
 

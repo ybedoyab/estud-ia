@@ -22,6 +22,18 @@ if grep -q "FERNET_KEY=cambia-esta-clave-fernet" .env; then
   echo "FERNET_KEY generada en .env"
 fi
 
+if ! grep -q '^JWT_SECRET=.' .env || grep -q 'JWT_SECRET=cambia-esta-clave-jwt' .env; then
+  jwt="$(openssl rand -base64 32 | tr '+/' '-_')"
+  if grep -q 'JWT_SECRET=cambia-esta-clave-jwt' .env; then
+    tmp="$(mktemp)"
+    sed "s|JWT_SECRET=cambia-esta-clave-jwt|JWT_SECRET=${jwt}|" .env > "$tmp"
+    mv "$tmp" .env
+  else
+    printf '\nJWT_SECRET=%s\n' "$jwt" >> .env
+  fi
+  echo "JWT_SECRET generada en .env"
+fi
+
 clave="$(grep '^AIRFLOW_ADMIN_PASSWORD=' .env | head -n 1 | cut -d= -f2-)"
 mkdir -p config
 printf '{"admin":"%s"}\n' "$clave" > config/simple_auth_passwords.json

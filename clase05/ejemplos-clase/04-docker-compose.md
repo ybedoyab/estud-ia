@@ -14,4 +14,4 @@ No está Redis. No está Celery. No está el triggerer: las tareas de esta clase
 
 Los volúmenes `dags`, `logs` y `data` se ven en la carpeta del laboratorio. `postgres-db` se queda dentro de Docker.
 
-`preparar` construye la imagen propia, que solo agrega pandas 2.2.3 y requests 2.32.3 encima de Airflow 3.4.0.
+`preparar` construye la imagen propia. Airflow 3.4.0 ya trae pandas 3.1.0 y requests 2.34.2; el Dockerfile deja esas versiones fijas.

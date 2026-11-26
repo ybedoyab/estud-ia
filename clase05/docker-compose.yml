@@ -11,6 +11,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_passwords.json
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:estudia_meta_local@postgres/airflow
     AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+    AIRFLOW__API_AUTH__JWT_SECRET: ${JWT_SECRET}
+    AIRFLOW__API_AUTH__JWT_ISSUER: estudia-clase05
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
@@ -28,7 +30,7 @@ x-airflow-common: &airflow-common
     - ./data:/opt/airflow/data
     - ./fixtures:/opt/airflow/fixtures:ro
     - ./pipeline:/opt/airflow/extra/pipeline:ro
-    - ./config/simple_auth_passwords.json:/opt/airflow/simple_auth_passwords.json:ro
+    - ./config/simple_auth_passwords.json:/opt/airflow/simple_auth_passwords.json
   user: "50000:0"
   depends_on:
     postgres:

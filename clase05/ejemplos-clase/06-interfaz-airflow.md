@@ -6,7 +6,7 @@ Usuario: `admin`
 
 Contraseña inicial: `estudia-local`
 
-En Airflow 3 la pantalla la sirve el api-server. No hay un contenedor aparte llamado webserver.
+En Airflow 3 la pantalla la sirve el api-server. No hay un contenedor aparte llamado webserver. El health puede marcar el triggerer como down. Este laboratorio no lo arranca y las tareas igual corren.
 
 DAGs que deben aparecer, en pausa:
 

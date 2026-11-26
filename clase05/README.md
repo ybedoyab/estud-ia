@@ -10,8 +10,8 @@ La interfaz queda en [http://127.0.0.1:8080](http://127.0.0.1:8080). No hace fal
 |---|---|
 | Airflow | `apache/airflow:3.4.0` |
 | Metadatos | `postgres:16.6`, LocalExecutor |
-| Pandas | 2.2.3 |
-| Requests | 2.32.3 |
+| Pandas | 3.1.0 |
+| Requests | 2.34.2 |
 
 No se usa la etiqueta `latest`. No hay Redis ni Celery.
 
